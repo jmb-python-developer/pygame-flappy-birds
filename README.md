@@ -21,11 +21,6 @@ cd pygame-flappy-birds
 ```
 Run the game with the command:
 ```
-mydevice  module main.py
+mydevice module main.py
 ```
 Enjoy the game!
-
-## Screenshot
-
-Visit this image to see a sample of the game played:
-[!Flappy Bird Game Image](https://img.freepik.com/free-photo/realistic-mobile-phone-with-flappy-bird-game_23-2149021863.jpg)

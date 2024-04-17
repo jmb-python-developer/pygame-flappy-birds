@@ -1,5 +1,4 @@
 import pygame
-
 import assets
 import configs
 
@@ -11,8 +10,10 @@ from objects.gameover_message import GameOverMessage
 from objects.gamestart_message import GameStartMessage
 from objects.score import Score
 
+# Initialize the pygame module
 pygame.init()
 
+# Set up the display with dimensions from config
 screen = pygame.display.set_mode((configs.SCREEN_WIDTH, configs.SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 column_create_event = pygame.USEREVENT
@@ -20,24 +21,25 @@ running = True
 gameover = False
 gamestarted = False
 
-# Load sprite assets
+# Load game assets
 assets.load_sprites()
-# Load audio assets
 assets.load_audios()
 
+# Create a layered update group for all sprites
 sprites = pygame.sprite.LayeredUpdates()
 
 
 def create_sprites():
-    # Draw them too, by instantiating, so then it scrolls to the left correctly constantly
+    """ Create initial set of sprites for the game and handle their layering. """
     Background(0, sprites)
     Background(1, sprites)
     Floor(0, sprites)
     Floor(1, sprites)
-    # Bird Sprite
+    # Return initialized bird, start message, and score objects
     return Bird(sprites), GameStartMessage(sprites), Score(sprites)
 
 
+# Initialize game components
 bird, game_started_message, score = create_sprites()
 
 while running:
@@ -46,7 +48,6 @@ while running:
             running = False
         if event.type == column_create_event:
             Column(sprites)
-        # Capture event and trigger gamer start
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE and not gamestarted and not gameover:
                 gamestarted = True
@@ -61,14 +62,14 @@ while running:
         if not gameover:
             bird.handle_event(event)
 
-    # Fill background with pink color (arbitrarily chosen)
+    # Clear screen to a single color (can be modified)
     screen.fill(0)
 
-    # Draw the screen object, from all the sprites pre-loaded into classes (see Background above for example)
+    # Draw all sprites on the screen
     sprites.draw(screen)
 
-    # if gamestarted message is removed and is not gameover for player, render/update all sprites in screen
     if gamestarted and not gameover:
+        # Update all sprites
         sprites.update()
 
     if bird.check_collision(sprites) and not gameover:
@@ -78,12 +79,15 @@ while running:
         pygame.time.set_timer(column_create_event, 0)
         assets.play_audio("hit")
 
+    # Update score and play point sound if a column is passed
     for sprite in sprites:
-        if type(sprite) is Column and sprite.is_passed():
+        if isinstance(sprite, Column) and sprite.is_passed():
             score.value += 1
             assets.play_audio("point")
 
+    # Refresh game screen
     pygame.display.flip()
     clock.tick(configs.FPS)
 
+# Quit pygame when the main loop is exited
 pygame.quit()
